@@ -31,14 +31,15 @@ class Interceptor
     {
         if (self::isWindows()) {
             if (!\class_exists('COM')) {
-                self::eprintln('Warning: COM extension si require On Windows: extension=php_com_dotnet (PHP 8.1)');
+                self::eprintln('Warning: COM extension is required on Windows. Make sure line extension=php_com_dotnet in php.ini is present and doesn\'t start with ";".');
                 return false;
             }
 
             try {
                 $this->dll = new \COM('ZenithiesCLIKeys.ReadKey');
             } catch (\Throwable $e) {
-                self::eprintln("Unable to initialize ZenithiesCLIKeys.ReadKey, make sure it is registered by regsvr32 and you've picked architecture matching your PHP installation: {$e->getMessage()}");
+                $bitness = (PHP_INT_SIZE === 8) ? '64-bit' : '32-bit'; // check PHP build's bit architecture
+                self::eprintln("Unable to initialize ZenithiesCLIKeys.ReadKey. Make sure it is registered by regsvr32 and you've picked {$bitness} architecture (i.e. matching your PHP installation): {$e->getMessage()}");
                 return false;
             }
 
